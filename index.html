@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Style Cricket Overlay</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- OBS AREA (NO CHANGE - SAME AS BEFORE) -->
+    <div id="obs-area">
+        <div class="logo-box left-logo">
+            <img id="disp-teamA-logo" src="" alt="" class="hidden">
+        </div>
+
+        <div class="overlay-bar">
+            <!-- BATTING -->
+            <div class="wing batting-wing">
+                <div class="player-row active-striker" id="p1-row">
+                    <div class="icon-spot"><i class="fas fa-baseball-bat-ball" id="p1-icon"></i></div>
+                    <div class="name" id="disp-p1-name">STRIKER</div>
+                    <div class="stats">
+                        <span class="runs" id="disp-p1-runs">0</span>
+                        <span class="balls" id="disp-p1-balls">0</span>
+                    </div>
+                </div>
+                <div class="player-row" id="p2-row">
+                    <div class="icon-spot"><i class="fas fa-baseball-bat-ball hidden" id="p2-icon"></i></div>
+                    <div class="name" id="disp-p2-name">NON-STRIKER</div>
+                    <div class="stats">
+                        <span class="runs" id="disp-p2-runs">0</span>
+                        <span class="balls" id="disp-p2-balls">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER -->
+            <div class="center-stage">
+                <div class="vs-text">
+                    <span id="disp-teamA-code">TEA</span> <span class="vs">vs</span> <span id="disp-teamB-code">TEB</span>
+                </div>
+                <div class="main-score-pill">
+                    <span id="disp-runs">0</span>-<span id="disp-wickets">0</span>
+                </div>
+                <div class="overs-text">
+                    <span id="disp-overs">0.0</span> OVERS
+                </div>
+                <div class="rr-text">
+                    RUN RATE <span id="disp-crr">0.00</span>
+                </div>
+            </div>
+
+            <!-- BOWLING -->
+            <div class="wing bowling-wing">
+                <div class="bowler-top">
+                    <div class="bowler-name" id="disp-bowler-name">BOWLER</div>
+                </div>
+                <div class="ball-grid" id="disp-balls-container"></div>
+            </div>
+        </div>
+
+        <div class="logo-box right-logo">
+            <img id="disp-teamB-logo" src="" alt="" class="hidden">
+        </div>
+    </div>
+
+    <!-- CONTROL PANEL (UPDATED) -->
+    <div class="control-panel">
+        <div class="cp-header">
+            <h3>🏏 Scoreboard Operator</h3>
+            <div class="action-buttons">
+                <!-- NEW RESET BUTTON -->
+                <button onclick="resetMatch()" class="btn-reset">⚠️ Reset All</button>
+                <button onclick="undo()" class="btn-undo">↩ Undo</button>
+                <button onclick="updateScoreboard()" class="btn-update">Update (Enter)</button>
+            </div>
+        </div>
+
+        <div class="cp-grid">
+            <!-- Teams -->
+            <div class="group">
+                <h4>Teams</h4>
+                <input type="text" id="in-teamA-code" value="BAN" placeholder="Team A Code">
+                <input type="file" id="in-teamA-logo" accept="image/*">
+                <hr>
+                <input type="text" id="in-teamB-code" value="IND" placeholder="Team B Code">
+                <input type="file" id="in-teamB-logo" accept="image/*">
+            </div>
+
+            <!-- Score (Added validate-num class) -->
+            <div class="group">
+                <h4>Match Score</h4>
+                <div class="row">
+                    <input type="number" id="in-runs" class="validate-num" value="0" placeholder="Runs">
+                    <input type="number" id="in-wickets" class="validate-num" value="0" placeholder="Wkts">
+                </div>
+                <div class="row">
+                    <input type="number" id="in-overs" class="validate-num" value="0.0" step="0.1" placeholder="Overs">
+                    <input type="number" id="in-crr" class="validate-num" value="0.00" step="0.01" placeholder="CRR">
+                </div>
+            </div>
+
+            <!-- Batters -->
+            <div class="group">
+                <h4>Batting</h4>
+                <div class="row">
+                    <input type="radio" name="striker" value="p1" checked onchange="updateScoreboard()"> Striker
+                </div>
+                <input type="text" id="in-p1-name" value="Batter 1">
+                <div class="row">
+                    <input type="number" id="in-p1-runs" class="validate-num" value="0">
+                    <input type="number" id="in-p1-balls" class="validate-num" value="0">
+                </div>
+                <hr>
+                <div class="row">
+                    <input type="radio" name="striker" value="p2" onchange="updateScoreboard()"> Striker
+                </div>
+                <input type="text" id="in-p2-name" value="Batter 2">
+                <div class="row">
+                    <input type="number" id="in-p2-runs" class="validate-num" value="0">
+                    <input type="number" id="in-p2-balls" class="validate-num" value="0">
+                </div>
+            </div>
+
+            <!-- Bowler & Balls -->
+            <div class="group full">
+                <h4>Bowling & This Over</h4>
+                <input type="text" id="in-bowler-name" value="Bowler">
+                <div class="ball-input">
+                    <!-- Ball input allows letters like W, so NO validate-num here -->
+                    <input type="text" id="in-ball-val" placeholder="Ball value (1, 4, 6, W)" onkeypress="handleEnter(event)">
+                    <button onclick="addBallFromInput()">Add Ball</button>
+                </div>
+                <div class="quick-btns">
+                    <button onclick="quickUpdate(0)">0</button>
+                    <button onclick="quickUpdate(1)">1</button>
+                    <button onclick="quickUpdate(2)">2</button>
+                    <button onclick="quickUpdate(4)">4</button>
+                    <button onclick="quickUpdate(6)">6</button>
+                    <button onclick="quickUpdate('W')">OUT</button>
+                    <button onclick="quickUpdate('wd')">Wide</button>
+                    <button onclick="quickUpdate('nb')">No Ball</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
