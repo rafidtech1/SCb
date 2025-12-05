@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Style Cricket Overlay</title>
+    <title>SCB - Live Cricket Scoreboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- OBS AREA (NO CHANGE - SAME AS BEFORE) -->
+    <!-- ========================================= -->
+    <!-- OBS AREA (NO UI CHANGE - STRICTLY KEPT)   -->
+    <!-- ========================================= -->
     <div id="obs-area">
         <div class="logo-box left-logo">
             <img id="disp-teamA-logo" src="" alt="" class="hidden">
@@ -66,39 +68,55 @@
         </div>
     </div>
 
-    <!-- CONTROL PANEL (UPDATED) -->
+    <!-- ========================================= -->
+    <!-- CONTROL PANEL (UPDATED FEATURES)          -->
+    <!-- ========================================= -->
     <div class="control-panel">
         <div class="cp-header">
-            <h3>🏏 Scoreboard Operator</h3>
+            <h3>🏏 SCB Operator Panel</h3>
             <div class="action-buttons">
-                <!-- NEW RESET BUTTON -->
-                <button onclick="resetMatch()" class="btn-reset">⚠️ Reset All</button>
-                <button onclick="undo()" class="btn-undo">↩ Undo</button>
-                <button onclick="updateScoreboard()" class="btn-update">Update (Enter)</button>
+                <button onclick="resetMatch()" class="btn-reset" title="Ctrl+R">⚠️ Reset Match</button>
+                <button onclick="swapTeams()" class="btn-swap">Swap Teams 🔁</button>
+                <button onclick="undo()" class="btn-undo" title="Ctrl+Z">↩ Undo Ball</button>
+                <button onclick="manualUpdate()" class="btn-update">Update (Enter)</button>
             </div>
         </div>
 
         <div class="cp-grid">
+            <!-- Match Info -->
+            <div class="group full">
+                <h4>Match Info (Optional)</h4>
+                <div class="row">
+                    <input type="text" id="in-match-title" placeholder="Tournament Name / Match Title">
+                    <input type="text" id="in-toss-result" placeholder="Toss Info (e.g. BAN elected to bat)">
+                </div>
+            </div>
+
             <!-- Teams -->
             <div class="group">
                 <h4>Teams</h4>
-                <input type="text" id="in-teamA-code" value="BAN" placeholder="Team A Code">
+                <input type="text" id="in-teamA-code" placeholder="Team A Code (BAN)">
                 <input type="file" id="in-teamA-logo" accept="image/*">
                 <hr>
-                <input type="text" id="in-teamB-code" value="IND" placeholder="Team B Code">
+                <input type="text" id="in-teamB-code" placeholder="Team B Code (IND)">
                 <input type="file" id="in-teamB-logo" accept="image/*">
             </div>
 
-            <!-- Score (Added validate-num class) -->
+            <!-- Score -->
             <div class="group">
                 <h4>Match Score</h4>
                 <div class="row">
-                    <input type="number" id="in-runs" class="validate-num" value="0" placeholder="Runs">
-                    <input type="number" id="in-wickets" class="validate-num" value="0" placeholder="Wkts">
+                    <input type="number" id="in-runs" class="input-focus-target" data-key="r" placeholder="Runs (Shortcut: R)">
+                    <input type="number" id="in-wickets" class="input-focus-target" data-key="w" placeholder="Wkts (Shortcut: W)">
                 </div>
                 <div class="row">
-                    <input type="number" id="in-overs" class="validate-num" value="0.0" step="0.1" placeholder="Overs">
-                    <input type="number" id="in-crr" class="validate-num" value="0.00" step="0.01" placeholder="CRR">
+                    <!-- Note: Overs are auto-calc, but editable -->
+                    <input type="number" id="in-overs" class="input-focus-target" data-key="o" placeholder="Overs (Shortcut: O)" step="0.1">
+                    <input type="number" id="in-crr" placeholder="CRR (Auto)" step="0.01" readonly>
+                </div>
+                <div class="row">
+                     <!-- Total Legal Balls (Hidden helper for calculations) -->
+                     <input type="hidden" id="in-total-balls" value="0">
                 </div>
             </div>
 
@@ -106,44 +124,49 @@
             <div class="group">
                 <h4>Batting</h4>
                 <div class="row">
-                    <input type="radio" name="striker" value="p1" checked onchange="updateScoreboard()"> Striker
+                    <input type="radio" name="striker" value="p1" checked onchange="manualUpdate()"> Striker
                 </div>
-                <input type="text" id="in-p1-name" value="Batter 1">
+                <input type="text" id="in-p1-name" placeholder="Batter 1 Name">
                 <div class="row">
-                    <input type="number" id="in-p1-runs" class="validate-num" value="0">
-                    <input type="number" id="in-p1-balls" class="validate-num" value="0">
+                    <input type="number" id="in-p1-runs" placeholder="Runs">
+                    <input type="number" id="in-p1-balls" placeholder="Balls">
                 </div>
                 <hr>
                 <div class="row">
-                    <input type="radio" name="striker" value="p2" onchange="updateScoreboard()"> Striker
+                    <input type="radio" name="striker" value="p2" onchange="manualUpdate()"> Striker
                 </div>
-                <input type="text" id="in-p2-name" value="Batter 2">
+                <input type="text" id="in-p2-name" placeholder="Batter 2 Name">
                 <div class="row">
-                    <input type="number" id="in-p2-runs" class="validate-num" value="0">
-                    <input type="number" id="in-p2-balls" class="validate-num" value="0">
+                    <input type="number" id="in-p2-runs" placeholder="Runs">
+                    <input type="number" id="in-p2-balls" placeholder="Balls">
                 </div>
             </div>
 
             <!-- Bowler & Balls -->
             <div class="group full">
-                <h4>Bowling & This Over</h4>
-                <input type="text" id="in-bowler-name" value="Bowler">
+                <h4>Bowling & Ball-by-Ball</h4>
+                <input type="text" id="in-bowler-name" placeholder="Bowler Name">
+                
                 <div class="ball-input">
-                    <!-- Ball input allows letters like W, so NO validate-num here -->
-                    <input type="text" id="in-ball-val" placeholder="Ball value (1, 4, 6, W)" onkeypress="handleEnter(event)">
-                    <button onclick="addBallFromInput()">Add Ball</button>
+                    <input type="text" id="in-ball-val" class="input-focus-target" data-key="b" placeholder="Value (1, 4, W, WD...) [Shortcut: B]" onkeypress="handleBallInputEnter(event)">
+                    <button onclick="processBallInput()">Add Ball</button>
                 </div>
+
                 <div class="quick-btns">
-                    <button onclick="quickUpdate(0)">0</button>
-                    <button onclick="quickUpdate(1)">1</button>
-                    <button onclick="quickUpdate(2)">2</button>
-                    <button onclick="quickUpdate(4)">4</button>
-                    <button onclick="quickUpdate(6)">6</button>
-                    <button onclick="quickUpdate('W')">OUT</button>
-                    <button onclick="quickUpdate('wd')">Wide</button>
-                    <button onclick="quickUpdate('nb')">No Ball</button>
+                    <button onclick="addBall(0)">0</button>
+                    <button onclick="addBall(1)">1</button>
+                    <button onclick="addBall(2)">2</button>
+                    <button onclick="addBall(3)">3</button>
+                    <button onclick="addBall(4)">4</button>
+                    <button onclick="addBall(6)">6</button>
+                    <button onclick="addBall('W')" style="background:#d63031;">OUT (W)</button>
+                    <button onclick="addBall('WD')" style="background:#e17055;">WD</button>
+                    <button onclick="addBall('NB')" style="background:#e17055;">NB</button>
                 </div>
             </div>
+        </div>
+        <div style="margin-top:10px; font-size: 0.8rem; color: #777;">
+            Shortcuts: <b>Enter</b>=Update | <b>Ctrl+Z</b>=Undo | <b>Ctrl+R</b>=Reset | <b>R</b>=Runs | <b>W</b>=Wkts | <b>O</b>=Overs | <b>B</b>=Ball Input
         </div>
     </div>
 

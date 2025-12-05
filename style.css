@@ -9,11 +9,12 @@ body {
 }
 
 /* ========================================= */
-/*  OBS OVERLAY STYLING (UNCHANGED)          */
+/*  OBS OVERLAY STYLING (REQUIRED)           */
 /* ========================================= */
 #obs-area {
-    width: 1280px; height: 200px;
-    background: transparent;
+    width: 1280px; /* Fixed Width */
+    height: 200px;
+    background: transparent !important; /* REQUIREMENT: Transparent Background */
     display: flex; align-items: center; justify-content: center;
     position: relative; margin-top: 50px; margin-bottom: 50px; padding: 0 40px;
 }
@@ -24,7 +25,7 @@ body {
     display: flex; justify-content: center; align-items: center; z-index: 10;
 }
 .logo-box img { max-width: 90%; max-height: 90%; object-fit: contain; }
-.hidden { opacity: 0; } /* For hidden logos/icons */
+.hidden { opacity: 0; }
 .left-logo { margin-right: -20px; z-index: 5; }
 .right-logo { margin-left: -20px; z-index: 5; }
 
@@ -83,38 +84,46 @@ body {
 .ball-4 { background: #0088ff; color: white; }
 .ball-6 { background: #d11d53; color: white; }
 .ball-W { background: #ff0000; color: white; border: 1px solid white; }
+.ball-WD, .ball-NB { background: #e17055; color: white; font-size: 0.7rem; }
 
 /* ========================================= */
-/*  CONTROL PANEL (UPDATED)                  */
+/*  CONTROL PANEL                            */
 /* ========================================= */
 .control-panel {
     background: #222; color: #eee; padding: 20px; width: 95%; max-width: 900px;
     border-radius: 10px; border: 1px solid #444; margin-bottom: 40px;
 }
-.cp-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
-button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
+.cp-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; align-items: center; }
+.action-buttons { display: flex; gap: 10px; }
+button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
 
 /* Button Colors */
-.btn-undo { background: #555; color: white; margin-right: 10px; }
+.btn-undo { background: #555; color: white; }
+.btn-undo:hover { background: #777; }
 .btn-update { background: #00cc66; color: white; }
-.btn-reset { background: #d63031; color: white; margin-right: 10px; } /* Red for reset */
+.btn-update:hover { background: #00ee77; }
+.btn-reset { background: #d63031; color: white; } 
 .btn-reset:hover { background: #ff7675; }
+.btn-swap { background: #0984e3; color: white; }
+.btn-swap:hover { background: #74b9ff; }
 
 .cp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
 .group { background: #333; padding: 15px; border-radius: 5px; }
-.group h4 { color: #d11d53; margin-bottom: 10px; text-transform: uppercase; }
+.group h4 { color: #d11d53; margin-bottom: 10px; text-transform: uppercase; font-size: 0.9rem; }
 .full { grid-column: 1 / -1; }
 
 .row { display: flex; gap: 10px; margin-bottom: 5px; align-items: center; }
-input[type="text"], input[type="number"] {
-    width: 100%; padding: 8px; margin-bottom: 5px; background: #111; border: 1px solid #555; color: white;
+input[type="text"], input[type="number"], input[type="file"] {
+    width: 100%; padding: 8px; margin-bottom: 5px; background: #111; border: 1px solid #555; color: white; font-family: 'Roboto Condensed', sans-serif;
 }
 input[type="text"]:focus, input[type="number"]:focus {
     border-color: #00cc66; outline: none; background: #000;
 }
+input[readonly] { background: #222; color: #888; border: 1px dashed #444; }
+
 hr { border: 0; border-top: 1px solid #444; margin: 10px 0; }
 
 .ball-input { display: flex; gap: 10px; margin-bottom: 10px; }
 .ball-input button { background: #0088ff; color: white; }
-.quick-btns button { margin-right: 5px; background: #444; color: white; margin-bottom: 5px; }
+.quick-btns button { margin-right: 5px; background: #444; color: white; margin-bottom: 5px; min-width: 40px; }
 .quick-btns button:hover { background: #d11d53; }
